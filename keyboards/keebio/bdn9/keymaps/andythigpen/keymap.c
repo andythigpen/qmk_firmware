@@ -128,7 +128,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
     case END_DEBUG:
         if (record->event.pressed) {
-            SEND_STRING(SS_TAP(X_ESCAPE) ":VimspectorReset" SS_TAP(X_ENTER));
+            SEND_STRING(SS_TAP(X_ESCAPE) " dr" SS_TAP(X_ENTER));
             layer_move(_PROGRAMMING_LAYER);
         }
         break;
@@ -140,19 +140,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case TEST_LAST:
         if (record->event.pressed)
-            SEND_STRING(SS_TAP(X_ESCAPE) ":TestLast" SS_TAP(X_ENTER));
+            SEND_STRING(SS_TAP(X_ESCAPE) " tl" SS_TAP(X_ENTER));
         break;
     case TEST_SUITE:
         if (record->event.pressed)
-            SEND_STRING(SS_TAP(X_ESCAPE) ":TestSuite" SS_TAP(X_ENTER));
+            SEND_STRING(SS_TAP(X_ESCAPE) " ts" SS_TAP(X_ENTER));
         break;
     case TEST_FILE:
         if (record->event.pressed)
-            SEND_STRING(SS_TAP(X_ESCAPE) ":TestFile" SS_TAP(X_ENTER));
+            SEND_STRING(SS_TAP(X_ESCAPE) " tf" SS_TAP(X_ENTER));
         break;
     case TEST_NEAREST:
         if (record->event.pressed)
-            SEND_STRING(SS_TAP(X_ESCAPE) ":TestNearest" SS_TAP(X_ENTER));
+            SEND_STRING(SS_TAP(X_ESCAPE) " tn" SS_TAP(X_ENTER));
         break;
     case RUN_SERVICE:
         if (record->event.pressed)
