@@ -18,6 +18,7 @@
 #include "raw_hid.h"
 #include "rgblight.h"
 #include "rgblight_list.h"
+#include "virtser.h"
 
 // LEDs under the board
 #define LED_UNDER_L 9
@@ -63,6 +64,12 @@ enum custom_keycodes {
     CUSTOM_MACRO5,      // cmd+F17
     CUSTOM_MACRO6,      // cmd+F18
 };
+
+// Serial commands for keyboard host daemon
+#define EVENT_MUTE_SLACK      2
+#define EVENT_MUTE_TEAMS      3
+#define EVENT_FOCUS_SLACK     4
+#define EVENT_FOCUS_TEAMS     5
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Default Fn layout */
@@ -166,13 +173,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case MUTE_TEAMS_FOCUS:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_F19))));
+            /* SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_F19)))); */
+            virtser_send(EVENT_MUTE_TEAMS);
             set_mute_status(!muted_status);
         }
         break;
     case FOCUS_TEAMS:
-        if (record->event.pressed)
-            SEND_STRING(SS_LSFT(SS_TAP(X_F19)));
+        if (record->event.pressed) {
+            /* SEND_STRING(SS_LSFT(SS_TAP(X_F19))); */
+            virtser_send(EVENT_FOCUS_TEAMS);
+        }
         break;
     case MUTE_SLACK:
         if (record->event.pressed) {
@@ -182,13 +192,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case MUTE_SLACK_FOCUS:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_F18))));
+            /* SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_F18)))); */
+            virtser_send(EVENT_MUTE_SLACK);
             set_mute_status(!muted_status);
         }
         break;
     case FOCUS_SLACK:
-        if (record->event.pressed)
-            SEND_STRING(SS_LSFT(SS_TAP(X_F18)));
+        if (record->event.pressed) {
+            /* SEND_STRING(SS_LSFT(SS_TAP(X_F18))); */
+            virtser_send(EVENT_FOCUS_SLACK);
+        }
         break;
     case START_SLACK:
         if (record->event.pressed) {
@@ -306,6 +319,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 #define CMD_SET_SPEED           10  // sets animation speed
 #define CMD_SET_MUTE_STATUS     11  // sets mute status
 #define CMD_END_CALL            12  // clears mute status and resets key LEDs
+#define CMD_ECHO                13  // for testing, just echos the received bytes back
 
 uint8_t cmd, len, buf_idx;
 uint8_t buf[MAX_BUF_LEN];
@@ -414,6 +428,13 @@ void process_cmd(void) {
             dprintf("end call\n");
             end_call();
             layer_move(_DEFAULT_LAYER);
+            break;
+
+        case CMD_ECHO:
+            for (uint8_t i = 0; i < len; ++i) {
+                dprintf("echo %d\n", buf[i]);
+                virtser_send(buf[i]);
+            }
             break;
     }
 }
