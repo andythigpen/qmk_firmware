@@ -70,6 +70,9 @@ enum custom_keycodes {
 #define EVENT_MUTE_TEAMS      3
 #define EVENT_FOCUS_SLACK     4
 #define EVENT_FOCUS_TEAMS     5
+#define EVENT_START_SLACK     6
+#define EVENT_START_TEAMS     7
+#define EVENT_END_CALL        8
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Default Fn layout */
@@ -207,12 +210,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) {
             set_mute_status(false);
             layer_move(_SLACK_LAYER);
+            virtser_send(EVENT_START_SLACK);
         }
         break;
     case START_TEAMS:
         if (record->event.pressed) {
             set_mute_status(true);
             layer_move(_TEAMS_LAYER);
+            virtser_send(EVENT_START_TEAMS);
         }
         break;
     case END_CALL:
@@ -516,6 +521,7 @@ void end_call(void) {
     rgb_matrix_sethsv_noeeprom(0, 0, 20);
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     muted_status = false;
+    virtser_send(EVENT_END_CALL);
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
