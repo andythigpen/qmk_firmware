@@ -1,2 +1,4 @@
 DEFAULT_FOLDER = keebio/bdn9/rev1
-# RAW_ENABLE = yes
+RAW_ENABLE = yes
+MIDI_ENABLE = no
+STENO_ENABLE = no
